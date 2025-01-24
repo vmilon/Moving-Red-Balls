@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moving Balls with Icons</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            position: relative;
+        }
+        #canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+        .content {
+            position: relative;
+            z-index: 1;
+            padding: 20px;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    <div class="content">
+        <h1>Moving Balls with Icons</h1>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        // Set canvas size
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        // Icons
+        const icons = [
+            '🚀', // Rocket
+            '🌟', // Star
+            '🌈', // Rainbow
+            '🍀', // Clover
+            '🎨'  // Palette
+        ];
+
+        const balls = [];
+        const numEmptyBalls = 15; // Additional empty balls
+
+        // Ball class
+        class Ball {
+            constructor(icon = null) {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.radius = Math.random() * 30 + 20; // Random radius between 20 and 50
+                this.dx = (Math.random() - 0.5) * 2; // Random x velocity
+                this.dy = (Math.random() - 0.5) * 2; // Random y velocity
+                this.alpha = Math.random() * 0.5 + 0.5; // Random alpha for fading effect
+                this.icon = icon;
+            }
+
+            update() {
+                this.x += this.dx;
+                this.y += this.dy;
+
+                // Bounce off walls
+                if (this.x + this.radius > canvas.width || this.x - this.radius < 0) {
+                    this.dx *= -1;
+                }
+                if (this.y + this.radius > canvas.height || this.y - this.radius < 0) {
+                    this.dy *= -1;
+                }
+            }
+
+            draw() {
+                // Draw the ball
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 0, 0, ${this.alpha})`; // Faded red color
+                ctx.fill();
+                ctx.closePath();
+
+                // Draw the icon if present
+                if (this.icon) {
+                    ctx.font = `${this.radius}px Arial`;
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(this.icon, this.x, this.y);
+                }
+            }
+        }
+
+        // Create balls with icons
+        icons.forEach(icon => {
+            balls.push(new Ball(icon));
+        });
+
+        // Create additional empty balls
+        for (let i = 0; i < numEmptyBalls; i++) {
+            balls.push(new Ball());
+        }
+
+        // Animation loop
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
+            balls.forEach(ball => {
+                ball.update();
+                ball.draw();
+            });
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+
+        // Resize canvas on window resize
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+    </script>
+</body>
+</html>
